@@ -34,6 +34,7 @@
     border-bottom:1px solid rgba(56,55,58,0.6);
   }
   .brand{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;}
+  .header-links{display:flex;align-items:center;gap:22px;}
   .gallery-btn{
     font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
     background:none;border:none;color:var(--fg);cursor:pointer;padding:0;
@@ -52,11 +53,6 @@
     object-fit:cover;
     background:
       linear-gradient(180deg, #141416 0%, #0a0a0b 55%, #0a0a0b 100%);
-  }
-  .landing-media-note{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--fg-dimmer);
   }
   .landing-scrim{
     position:absolute; inset:0; background:rgba(0,0,0,0.4); z-index:1;
@@ -235,7 +231,21 @@
     background:var(--bg-soft);
   }
   .media-row{display:flex;gap:16px;flex-wrap:wrap;}
-  .media-row .media-slot{flex:1 1 220px;aspect-ratio:4/3;}
+  .media-row .media-slot{flex:1 1 220px;aspect-ratio:4/3;margin:0;}
+  .media-slot.vertical{aspect-ratio:9/16;max-width:340px;margin:28px auto;}
+  .media-slot.filled{
+    border-style:solid; border-color:var(--line); padding:0; overflow:hidden;
+  }
+  .media-slot.filled img, .media-slot.filled video{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .audio-row{display:flex;gap:16px;flex-wrap:wrap;margin:28px 0;}
+  .audio-block{flex:1 1 220px;}
+  .audio-block .audio-label{
+    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--fg-dim);margin-bottom:10px;
+  }
+  .audio-block audio{width:100%;}
   .stat-row{display:flex;gap:32px;margin:28px 0;flex-wrap:wrap;}
   .stat{font-family:var(--mono);}
   .stat .num{font-size:22px;color:var(--fg);display:block;}
@@ -272,19 +282,54 @@
     .gallery-grid{grid-template-columns:repeat(2,1fr);}
     .gallery-inner{padding:88px 20px 80px;}
   }
+
+  /* ---------- trivia overlay ---------- */
+  .trivia-inner{max-width:900px;margin:0 auto;padding:100px 32px 100px;}
+  .trivia-body{
+    display:flex; gap:56px; align-items:center; margin-top:36px;
+  }
+  .trivia-list{flex:1 1 320px;}
+  .trivia-list ul{list-style:none;margin:0;padding:0;}
+  .trivia-list li{
+    font-size:16.5px; line-height:1.6; color:var(--fg-soft);
+    padding-left:22px; position:relative; margin-bottom:18px;
+  }
+  .trivia-list li::before{
+    content:'';position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;
+    background:var(--accent);
+  }
+  .trivia-photo{
+    flex:1 1 260px;
+    aspect-ratio:4/5;
+    border:1px dashed var(--line-bright); border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--fg-dimmer); background:var(--bg-soft);
+    overflow:hidden;
+  }
+  .trivia-photo.filled{border-style:solid;border-color:var(--line);}
+  .trivia-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  @media (max-width:640px){
+    .trivia-inner{padding:88px 20px 80px;}
+    .trivia-body{flex-direction:column; gap:32px;}
+  }
 </style>
 </head>
 <body>
 
 <header>
   <div class="brand">ELI FRESCO</div>
-  <button class="gallery-btn" id="galleryBtn">Gallery</button>
+  <div class="header-links">
+    <button class="gallery-btn" id="triviaBtn">Trivia</button>
+    <button class="gallery-btn" id="galleryBtn">Gallery</button>
+  </div>
 </header>
 
 <section class="landing">
-  <div class="landing-media">
-    <div class="landing-media-note">Showreel video (autoplay, muted) placeholder</div>
-  </div>
+  <video class="landing-media" autoplay muted loop playsinline>
+    <source src="Hero_vert.mp4" media="(max-width: 640px)">
+    <source src="Hero_horiz.mp4">
+  </video>
   <div class="landing-scrim"></div>
   <div class="landing-title">
     <div class="landing-name">Eli Fresco</div>
@@ -343,7 +388,7 @@
     <h2>Sim to Sound</h2>
     <div class="media-slot">Hero video, with audio (placeholder)</div>
     <p>A chain simulation setup left over from a jewelry commercial got me wondering what else Houdini's physics could drive. Every collision can be exported as a CSV with data like frame, impact force, which links collided, and more, so I spent an afternoon building an interface to turn that raw data into music.</p>
-    <div class="media-slot">App screenshot placeholder</div>
+    <div class="media-slot filled"><img src="Contact-Analyzer.jpg" alt="Collision data tool screenshot"></div>
     <p>Houdini only tracks impacts per frame, so I interpolate sub-frame notes ordered by chain-link position and jitter them for texture. Impact force drives MIDI velocity, run through a bezier curve and log-compression filter to tame the range. Preview it live in the tool, then export as MIDI and play with it in Ableton.</p>
     <p>Stack: Houdini (VEX, RBD collision export) → custom MIDI-cleanup tool (vibe coded) → Ableton Live.</p>
   </div>
@@ -351,13 +396,24 @@
   <div class="panel" id="panel-album">
     <div class="tag">Case Study 03</div>
     <h2>Album Sequencer</h2>
-    <p>A purpose-built app that ingests a full album, cuts the songs apart, and generates MIDI transitions between them based on data pulled from neighboring tracks. Commissioned to score a client's art project as a paid job, not a demo. Runs smoothly across large batches: one full processing pass ran for five hours unattended.</p>
-    <div class="media-slot">Example transition, audio placeholder</div>
-    <div class="stat-row">
-      <div class="stat"><span class="num">5 hrs</span><span class="label">unattended batch render</span></div>
-      <div class="stat"><span class="num">1</span><span class="label">full album, paid commission</span></div>
+    <div class="media-slot vertical filled"><img src="Transitions-Generator.jpg" alt="Album Sequencer app screenshot"></div>
+    <p>A client's art project called for fifteen five-hour videos, each one scored by a different album stretched, chopped, and rearranged to fill the runtime. He wanted the songs evenly dispersed, and short interludes added between each one. At that scale, doing it by hand wasn't realistic, so I built a tool to handle it procedurally. I was given a variety of genres, including ambient, classical, and experimental. It had to be flexible enough to adapt to almost any album's structure rather than being tuned for one genre.</p>
+    <div class="audio-row">
+      <div class="audio-block">
+        <div class="audio-label">Example Transition 1</div>
+        <audio controls src="transition%201.mp3"></audio>
+      </div>
+      <div class="audio-block">
+        <div class="audio-label">Example Transition 2</div>
+        <audio controls src="transition%202.mp3"></audio>
+      </div>
     </div>
-    <div class="media-slot">App UI screenshot placeholder</div>
+    <p>To stress-test it, I ran it against Aphex Twin, about as unpredictable as beat and chord analysis gets, to make sure the system still held up outside of anything conventionally structured.</p>
+    <div class="media-slot">Ableton timeline export, screenshot placeholder</div>
+    <div class="stat-row">
+      <div class="stat"><span class="num">15</span><span class="label">five-hour videos, one album each</span></div>
+      <div class="stat"><span class="num">5 hrs</span><span class="label">runtime generated per video</span></div>
+    </div>
   </div>
 </main>
 
@@ -368,6 +424,27 @@
       <button class="gallery-close" id="galleryClose">✕ close</button>
     </div>
     <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+<div class="gallery-overlay" id="triviaOverlay">
+  <div class="trivia-inner">
+    <div class="gallery-header">
+      <div class="gallery-title">Trivia</div>
+      <button class="gallery-close" id="triviaClose">✕ close</button>
+    </div>
+    <div class="trivia-body">
+      <div class="trivia-list">
+        <ul>
+          <li>I have played bass since 4th grade.</li>
+          <li>I got ahold of After Effects in 7th grade.</li>
+          <li>I taught at Minecraft engineering summer camp.</li>
+          <li>I don't know how to ride a bike.</li>
+          <li>I made this website from scratch in a few hours.</li>
+        </ul>
+      </div>
+      <div class="trivia-photo filled"><img src="Eli-Fresco.jpg" alt="Eli Fresco"></div>
+    </div>
   </div>
 </div>
 
@@ -576,9 +653,9 @@ function positionSkills(){
   const row1 = [items[0], items[1]];
   const row2 = [items[2], items[3]];
   const rowGapY = 14;
-  const halfSafe = MAX_SKILL_W/2 + 10; // half the widest label, plus margin
-  const bottomOffset = halfSafe + 10;  // fixed center-to-center distance, tighter
-  const topOffset = bottomOffset + 46; // fixed center-to-center distance, wider — same for every project
+  const halfWidth = MAX_SKILL_W / 2;
+  const bottomOffset = halfWidth + 8;   // tight, minimal safe margin
+  const topOffset = halfWidth + 66;     // fixed wide spread, same as before — unchanged
 
   function layoutRow(pair, offset, y){
     const centers = [centerX - offset, centerX + offset];
@@ -733,17 +810,29 @@ for(let i=1;i<=9;i++){
   galleryGrid.appendChild(tile);
 }
 
-function openGallery(){
-  galleryOverlay.classList.add('open');
+function openOverlay(el){
+  el.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closeGallery(){
-  galleryOverlay.classList.remove('open');
-  document.body.style.overflow = '';
+function closeOverlay(el){
+  el.classList.remove('open');
+  if(!galleryOverlay.classList.contains('open') && !triviaOverlay.classList.contains('open')){
+    document.body.style.overflow = '';
+  }
 }
-galleryBtn.addEventListener('click', openGallery);
-galleryClose.addEventListener('click', closeGallery);
-window.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeGallery(); });
+galleryBtn.addEventListener('click', () => openOverlay(galleryOverlay));
+galleryClose.addEventListener('click', () => closeOverlay(galleryOverlay));
+
+/* ---------- trivia overlay ---------- */
+const triviaBtn = document.getElementById('triviaBtn');
+const triviaOverlay = document.getElementById('triviaOverlay');
+const triviaClose = document.getElementById('triviaClose');
+triviaBtn.addEventListener('click', () => openOverlay(triviaOverlay));
+triviaClose.addEventListener('click', () => closeOverlay(triviaOverlay));
+
+window.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){ closeOverlay(galleryOverlay); closeOverlay(triviaOverlay); }
+});
 </script>
 
 </body>
